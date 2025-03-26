@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Teachers:ital,wght@0,400..800;1,400..800&family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+}
+
+body{
+    background-color: #f4f4f4;
+    height: 100vh;
+    margin: 0;
+    margin-top: 20px;
+}
+
+.center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container{
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.container .header-con, .container .form-con{
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: -1px 0px 5px -2px rgba(0,0,0,0.56);
+    -webkit-box-shadow: -1px 0px 5px -2px rgba(0,0,0,0.56);
+    -moz-box-shadow: -1px 0px 5px -2px rgba(0,0,0,0.56);
+    margin-bottom: 50px;
+}
+
+.container .form-con textarea{
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.container .form-con .center{
+    justify-content: end;
+}
+
+.container .form-con button{
+    padding: 10px 30px;
+    border: none;
+    border-radius: 5px;
+    background-color: #144e70;
+    color: white;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.container .header-con h1{
+    text-align: center;
+    margin: 20px 0;
+    color: #144e70;
+}
+
+.container .header-con p{
+    text-align: center;
+    line-height: 25px;
+    font-weight: 300;
+    font-size: 14px;
+}
+
+.form-con form{
+    padding-bottom: 20px;
+    border-bottom: 1px solid #144e70;
+}
+
+.form-con .results h1{
+    font-weight: 500;
+    margin: 20px 0;
+    color: #144e70;
+}
+
+.form-con .results p{
+    font-weight: 300;
+    margin-bottom: 20px;
+}

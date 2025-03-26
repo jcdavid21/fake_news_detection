@@ -1,0 +1,508 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 5px;
+        }
+
+        h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .app-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .card h2 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .result-real, .result-fake, .result-pending {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-real {
+            background-color: rgba(46, 204, 113, 0.2);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .result-fake {
+            background-color: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .result-pending {
+            background-color: rgba(243, 156, 18, 0.2);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .confidence-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .confidence-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        .status-message {
+            margin-top: 1rem;
+            color: var(--warning-color);
+        }
+
+        .model-status {
+            padding: 0.5rem 1rem;
+            background-color: var(--light-color);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .model-status.trained {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success-color);
+        }
+
+        .model-status.untrained {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger-color);
+        }
+
+        .train-section {
+            margin-top: 1.5rem;
+            border-top: 1px solid #eee;
+            padding-top: 1.5rem;
+        }
+
+        .file-input-group {
+            margin-bottom: 1rem;
+        }
+
+        .file-input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--secondary-color);
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-shield-alt"></i> Fake News Detector</h1>
+            <p class="app-description">
+                Enter news article text to analyze its authenticity using machine learning.
+            </p>
+            <div class="model-status {{ 'trained' if model_loaded else 'untrained' }}">
+                <i class="fas {{ 'fa-check-circle' if model_loaded else 'fa-exclamation-circle' }}"></i>
+                <span>Model Status: {{ 'Trained' if model_loaded else 'Not Trained' }}</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="card">
+                <h2><i class="fas fa-search"></i> News Analyzer</h2>
+                <textarea id="newsText" placeholder="Paste the news article text here..."></textarea>
+                <button id="analyzeBtn" class="btn">
+                    <i class="fas fa-search"></i> Analyze
+                </button>
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <span>Analyzing...</span>
+                </div>
+
+                <div id="result" class="result">
+                    <div id="resultReal" class="result-real" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>Likely Real News</strong>
+                    </div>
+                    <div id="resultFake" class="result-fake" style="display: none;">
+                        <i class="fas fa-times-circle"></i>
+                        <strong>Likely Fake News</strong>
+                    </div>
+                    <div id="resultPending" class="result-pending" style="display: none;">
+                        <i class="fas fa-question-circle"></i>
+                        <strong>Analysis Pending</strong>
+                    </div>
+
+                    <p>Confidence: <span id="confidenceValue">0</span>%</p>
+                    <div class="confidence-bar-container">
+                        <div id="confidenceBar" class="confidence-bar" style="width: 0%;"></div>
+                    </div>
+
+                    <div id="analysisDetails">
+                        <p>This analysis is based on text patterns and features that are commonly found in fake or real news. The model has been trained on labeled datasets of verified fake and real news articles.</p>
+                    </div>
+                </div>
+
+                <div id="statusMessage" class="status-message">
+                    {{ "Please train the model first using the section below." if not model_loaded }}
+                </div>
+            </div>
+
+            <div class="card" id="trainSection">
+                <h2><i class="fas fa-cogs"></i> Train Model</h2>
+                <p>Upload CSV files containing real and fake news to train the model. Each file should have a 'text' column containing the news content.</p>
+
+                <div class="train-section">
+                    <div class="file-input-group">
+                        <label for="trueNewsFile">Real News CSV:</label>
+                        <input type="file" id="trueNewsFile" accept=".csv">
+                    </div>
+                
+                    <div class="file-input-group">
+                        <label for="fakeNewsFile">Fake News CSV:</label>
+                        <input type="file" id="fakeNewsFile" accept=".csv">
+                    </div>
+                
+                    <button id="trainBtn" type="button" class="btn">
+                        <i class="fas fa-sync"></i> Train Model
+                    </button>
+                    <div id="trainingLoading" class="loading">
+                        <div class="spinner"></div>
+                        <span>Training model... This may take a while.</span>
+                    </div>
+                    <div id="trainingResult" style="margin-top: 1rem; display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const newsText = document.getElementById('newsText');
+            const result = document.getElementById('result');
+            const resultReal = document.getElementById('resultReal');
+            const resultFake = document.getElementById('resultFake');
+            const resultPending = document.getElementById('resultPending');
+            const confidenceValue = document.getElementById('confidenceValue');
+            const confidenceBar = document.getElementById('confidenceBar');
+            const loading = document.getElementById('loading');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            const trainBtn = document.getElementById('trainBtn');
+            const trueNewsFile = document.getElementById('trueNewsFile');
+            const fakeNewsFile = document.getElementById('fakeNewsFile');
+            const trainingLoading = document.getElementById('trainingLoading');
+            const trainingResult = document.getElementById('trainingResult');
+
+            const modelStatus = document.querySelector('.model-status');
+            const modelStatusIcon = modelStatus.querySelector('i');
+            const modelStatusText = modelStatus.querySelector('span');
+
+            // Function to check if files exist
+            async function checkFilesExist() {
+                try {
+                    // Check for model and vectorizer files
+                    const modelResponse = await fetch('http://127.0.0.1:5000/check-file?filename=model.pkl');
+                    const vectorizerResponse = await fetch('http://127.0.0.1:5000/check-file?filename=vectorizer.pkl');
+
+                    if (modelResponse.ok && vectorizerResponse.ok) {
+                        // Files exist, enable the analyzer button and update the status
+                        analyzeBtn.disabled = false;
+                        statusMessage.style.display = 'none';
+                        modelStatus.classList.remove('untrained');
+                        modelStatus.classList.add('trained');
+                        modelStatusIcon.classList.remove('fa-exclamation-circle');
+                        modelStatusIcon.classList.add('fa-check-circle');
+                        modelStatusText.textContent = 'Model Status: Trained';
+                    } else {
+                        // Files do not exist, disable the analyzer button and show the status message
+                        analyzeBtn.disabled = true;
+                        statusMessage.style.display = 'block';
+                        modelStatus.classList.remove('trained');
+                        modelStatus.classList.add('untrained');
+                        modelStatusIcon.classList.remove('fa-check-circle');
+                        modelStatusIcon.classList.add('fa-exclamation-circle');
+                        modelStatusText.textContent = 'Model Status: Not Trained';
+                    }
+                } catch (error) {
+                    console.error('Error checking files:', error);
+                }
+            }
+
+            // Call the function to check files when the page loads
+            checkFilesExist();
+
+            analyzeBtn.addEventListener('click', function() {
+                const text = newsText.value.trim();
+                
+                if (!text) {
+                    alert('Please enter news text to analyze');
+                    return;
+                }
+
+                // Show loading state
+                loading.style.display = 'flex';
+                analyzeBtn.disabled = true;
+                result.style.display = 'none';
+                statusMessage.style.display = 'none';
+                
+                // Send prediction request
+                fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ text: text })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading state
+                    loading.style.display = 'none';
+                    analyzeBtn.disabled = false;
+                    
+                    if (data.error) {
+                        statusMessage.textContent = data.error;
+                        statusMessage.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Show result
+                    result.style.display = 'block';
+                    
+                    // Update UI based on prediction
+                    resultReal.style.display = data.prediction === 'Real' ? 'flex' : 'none';
+                    resultFake.style.display = data.prediction === 'Fake' ? 'flex' : 'none';
+                    resultPending.style.display = 'none';
+                    
+                    // Update confidence
+                    const confidencePercent = Math.round(data.confidence * 100);
+                    confidenceValue.textContent = confidencePercent;
+                    
+                    // Update confidence bar
+                    confidenceBar.style.width = `${confidencePercent}%`;
+                    confidenceBar.style.backgroundColor = data.prediction === 'Real' ? 
+                        'var(--success-color)' : 'var(--danger-color)';
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    analyzeBtn.disabled = false;
+                    statusMessage.textContent = 'Error analyzing text: ' + error.message;
+                    statusMessage.style.display = 'block';
+                    console.error('Analysis error:', error);
+                });
+            });
+
+            trainBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                const trueNewsFileData = trueNewsFile.files[0];
+                const fakeNewsFileData = fakeNewsFile.files[0];
+                
+                if (!trueNewsFileData || !fakeNewsFileData) {
+                    alert('Please select both true news and fake news CSV files');
+                    return;
+                }
+
+                // Show loading state
+                trainingLoading.style.display = 'flex';
+                trainBtn.disabled = true;
+                trainingResult.style.display = 'none';
+                
+                // Create form data
+                const formData = new FormData();
+                formData.append('true_news', trueNewsFileData);
+                formData.append('fake_news', fakeNewsFileData);
+                
+                // Send training request
+                fetch('http://127.0.0.1:5000/train', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading state
+                    alert("Model trained successfully! Accuracy: " + (data.accuracy * 100).toFixed(2) + "%");
+                    trainingLoading.style.display = 'none';
+                    trainBtn.disabled = false;
+                    
+                    if (data.error) {
+                        trainingResult.innerHTML = `<div class="result-fake"><i class="fas fa-times-circle"></i> Error: ${data.error}</div>`;
+                        trainingResult.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Show success
+                    trainingResult.innerHTML = `<div class="result-real"><i class="fas fa-check-circle"></i> Model trained successfully! Accuracy: ${(data.accuracy * 100).toFixed(2)}%</div>`;
+                    trainingResult.style.display = 'block';
+                    
+                    // Update model status
+                    modelStatus.classList.remove('untrained');
+                    modelStatus.classList.add('trained');
+                    modelStatusIcon.classList.remove('fa-exclamation-circle');
+                    modelStatusIcon.classList.add('fa-check-circle');
+                    modelStatusText.textContent = 'Model Status: Trained';
+                    
+                    // Enable analyze button
+                    analyzeBtn.disabled = false;
+                    statusMessage.style.display = 'none';
+                })
+                .catch(error => {
+                    trainingLoading.style.display = 'none';
+                    trainBtn.disabled = false;
+                    trainingResult.innerHTML = `<div class="result-fake"><i class="fas fa-times-circle"></i> Error: ${error.message}</div>`;
+                    trainingResult.style.display = 'block';
+                    console.error('Training error:', error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
